@@ -1,0 +1,103 @@
+Create nginx site config
+sudo nano /etc/nginx/sites-available/activity_watch
+
+server {
+    listen 80;
+    server_name 192.168.55.154;
+
+    root /var/www/activity_watch;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+
+
+Backend service file:
+sudo nano /etc/systemd/system/activity-backend.service
+
+[Unit]
+Description=Activity Watch Backend
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=yc
+WorkingDirectory=/home/yc/activity_watch/backend
+Environment=USAGE_DB_DSN=postgresql://usage_user:usage_pass@localhost:5432/usage_db
+Environment=USAGE_SERVER_HOST=0.0.0.0
+Environment=USAGE_SERVER_PORT=8080
+ExecStart=/home/yc/activity_watch/backend/.venv/bin/python /home/yc/activity_watch/backend/server.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
+Reload systemd:
+sudo systemctl daemon-reload
+
+Enable and start backend:
+sudo systemctl enable activity-backend
+sudo systemctl start activity-backend
+
+Check backend status:
+sudo systemctl status activity-backend --no-pager
+
+
+
+8. Check nginx status
+
+sudo systemctl status nginx --no-pager
+9. Open firewall if needed
+If ufw is enabled:
+
+sudo ufw allow 80/tcp
+sudo ufw allow 8080/tcp
+sudo ufw status
+
+11. If you update the web app later
+Since nginx serves static files from /var/www/activity_watch, after git pull you need to recopy:
+
+sudo cp -r ~/activity_watch/web-app/* /var/www/activity_watch/
+sudo systemctl restart nginx
+12. If you update backend later
+After git pull:
+
+cd ~/activity_watch/backend
+source .venv/bin/activate
+# install deps only if requirements changed
+sudo systemctl restart activity-backend
+13. Useful commands
+Backend:
+
+sudo systemctl restart activity-backend
+sudo systemctl stop activity-backend
+sudo systemctl status activity-backend --no-pager
+journalctl -u activity-backend -f
+Web:
+
+sudo systemctl restart nginx
+sudo systemctl status nginx --no-pager
+
+
+
+Admin parol ucin:
+sudo nano /etc/activity-watch/backend.env
+
+
+Set the admin values you want, for example:
+
+USAGE_ADMIN_USERNAME=admin
+USAGE_ADMIN_PASSWORD=admin@123
+
+SELECT id, username, updated_at FROM admin_credentials;
+
+DELETE FROM admin_credentials;
+
+\q
+
+sudo systemctl restart activity-backend
+sudo systemctl status activity-backend --no-pager -l

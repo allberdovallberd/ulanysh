@@ -1,0 +1,39 @@
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+tmp*
+temp*
+
+# Logs
+*.log
+
+# Secrets
+.env
+.env.*
+
+# Flutter
+**/.dart_tool/
+**/.pub/
+**/build/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/android/.gradle/
+**/android/local.properties
+**/ios/Pods/
+
+# Node/Web
+**/node_modules/
+**/dist/
+**/.next/
+**/coverage/
+
+# Python backend (if applicable)
+**/__pycache__/
+*.pyc

@@ -1,0 +1,19 @@
+adb shell dpm set-device-owner com.example.usage_collector/.AppDeviceAdminReceiver
+adb shell dumpsys deviceidle whitelist +com.example.usage_collector
+adb shell dumpsys deviceidle disable
+adb shell am set-standby-bucket com.example.usage_collector active
+adb shell cmd appops set com.example.usage_collector RUN_ANY_IN_BACKGROUND allow
+adb shell cmd appops set com.example.usage_collector RUN_IN_BACKGROUND allow
+
+
+gurnamak:
+adb install -r app-release.apk
+adb install app-release.apk
+
+
+bshlatmak:
+adb shell monkey -p com.example.usage_collector -c android.intent.category.LAUNCHER 1
+
+
+device owner barlamak:
+adb shell dumpsys device_policy
